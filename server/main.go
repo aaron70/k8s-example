@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
-var requests = make(map[string]int)
+var m sync.Mutex
+var requests int = 0
 
 func main() {
 	app := fiber.New()
@@ -17,13 +19,14 @@ func main() {
 	api := app.Group("/api")
 
 	api.Get("/send", func(c *fiber.Ctx) error {
-		queries := c.Queries()
-		requests[queries["client"]] += 1
-		return c.SendString(fmt.Sprint(requests))
+		m.Lock()
+		requests += 1
+		m.Unlock()
+		return c.SendString(fmt.Sprintf("Cantidad de requests: %d", requests))
 	})
 
 	api.Get("/get", func(c *fiber.Ctx) error {
-		return c.SendString(fmt.Sprint(requests))
+		return c.SendString(fmt.Sprintf("Cantidad de requests: %d", requests))
 	})
 
 	log.Fatal(app.Listen(":5000"))
