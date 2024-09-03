@@ -27,12 +27,12 @@ kind: Service
 metadata:
   name: server-service
 spec:
+  type: NodePort
   selector:
     app: server
-  type: NodePort
   ports:
     - protocol: TCP
-      port: 5001
+      port: 5000
       targetPort: 5000
 
 ---
@@ -42,6 +42,7 @@ kind: Service
 metadata:
   name: server-svc
 spec:
+  type: ClusterIP 
   selector:
     app: server
   ports:
